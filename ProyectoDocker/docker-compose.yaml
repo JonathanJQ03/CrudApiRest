@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql
+    container_name: mi-mysql-jaguaco
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: test
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  backend-products:
+    image: img-products:v1.1
+    container_name: c-app-products-v1.0-jaguaco
+    ports:
+      - "8081:8003"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/test
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin123
+    depends_on:
+      - mysql
+
+  backend-category:
+    image: img-category:v4
+    container_name: c-app-category-jaguaco
+    ports:
+      - "8082:8008"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/test
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin123
+    depends_on:
+      - mysql
+
+  frontend:
+    image: crud-angular-img:v1.0
+    container_name: c-app-angular-jaguaco
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend-products
+      - backend-category
+
+volumes:
+  mysql-data:
